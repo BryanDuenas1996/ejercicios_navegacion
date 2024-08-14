@@ -1,11 +1,54 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 
+interface FormLogin{
+  email:string,
+  password:string
+};
+
+interface User{
+  id:number,
+  user:string,
+  password:string
+};
 
 interface Props extends StackScreenProps<any, any>{};
 export const LoginScreen= ({navigation}:Props)=> {
+  const users: User[]=[
+    {id:1, user:'Bryan',password:'12345'},
+    {id:2, user:'ryan',password:'123455'},
+    {id:3, user:'carlos',password:'123455'},
+    {id:4, user:'bri',password:'123456'}
+  ];
+  const [formLogin, setFormLogin]= useState<FormLogin>({
+    email:'',
+    password:''
+  });
+
+  const handleSetValues=(name:string, value: string)=>{
+    setFormLogin({...formLogin,[name]:value});
+  }
+
+  const handleSignin=()=>{
+    if (!formLogin.email || !formLogin.password){
+      Alert.alert("Error", "Porfavor completar los campos!");
+      return;
+    }
+
+    if(!verfyUser()){
+      Alert.alert("Error", "Usuario o contraseñaincorrecta");
+      return;
+    }
+    console.log(formLogin)
+  }
+
+  //vERIFICAR SI EXISTE USER Y PASSWORD
+  const verfyUser=()=>{
+    const existUser= users.filter(user=>user.user=== formLogin.email && user.password===formLogin.password)[0];
+    return existUser;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -15,15 +58,17 @@ export const LoginScreen= ({navigation}:Props)=> {
           style={styles.input}
           placeholder="Usuario"
           placeholderTextColor="#B0B0B0"
+          onChangeText={(value)=>handleSetValues('email', value)}
         />
         <TextInput
           style={styles.input}
           placeholder="Contraseña"
           placeholderTextColor="#B0B0B0"
-          secureTextEntry
+          secureTextEntry={true}
+          onChangeText={(value)=>handleSetValues('password', value)}
         />
         <TouchableOpacity style={styles.button} 
-         onPress={()=>navigation.navigate('Home')}>
+          onPress={handleSignin}>
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
       </View>
